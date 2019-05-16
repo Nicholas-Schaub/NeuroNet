@@ -1,4 +1,4 @@
-function [S] = CNNsegment(img,net,opts,batchSize,useGpu)
+function [S] = CNNsegmentMAT(img,net,opts,batchSize,useGpu)
 % segment.m
 %
 % This function uses a convolutional neural network trained using
@@ -19,19 +19,7 @@ function [S] = CNNsegment(img,net,opts,batchSize,useGpu)
 
 %% Initialize the network
     tic;
-    img = single(img);
-    nn = dagnn.DagNN.loadobj(net);
-    nn.mode = 'test';
-    pred_ind = nn.getVarIndex('pred');
-    if isnan(pred_ind)
-        error('Could not find prediction layer.');
-    end
-    nn.vars(pred_ind).precious = 1;
-    if useGpu
-        nn.move('gpu');
-    else
-        nn.move('cpu');
-    end
+    dag = mcn2mat(net,opts);
     disp(['Time to load network: ' num2str(toc)])
 
 %% Normalize and Pad the Image
@@ -40,6 +28,7 @@ function [S] = CNNsegment(img,net,opts,batchSize,useGpu)
     out_size = opts.prep.lblSize(1);
     xypad = (tile_size(1)-out_size)/2;
     
+    img = single(img);
     img = MaskedLocalResponse(img,true(size(img)),opts.prep.windowSize);
     img(img>opts.prep.maxNorm) = opts.prep.maxNorm;
     img(img<-opts.prep.maxNorm) = -opts.prep.maxNorm;
@@ -86,11 +75,11 @@ function [S] = CNNsegment(img,net,opts,batchSize,useGpu)
     seg_img = single(zeros(out_size,out_size,1,sub_batches(end)));
     
     for batch = 1:length(sub_batches)-1
-        nn.eval({'input',img_pixels(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)),'label',single(zeros(out_size,out_size,1,sub_batches(batch+1)-sub_batches(batch)))});
+        Y = predict(dag,img_pixels(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)));
         if useGpu
-            seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = gather(nn.getVar('pred').value)>0;
+            seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = gather(Y)>0;
         else
-            seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = (nn.getVar('pred').value)>0;
+            seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = Y>0;
         end
         disp(['Finished batch ' num2str(batch) ' of ' num2str(length(sub_batches)-1) '. Total duration: ' num2str(toc)]);
     end
