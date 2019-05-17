@@ -1,4 +1,4 @@
-function [imdb] = formatData(opts)
+function [imdb] = FormatData(opts)
 % FORMAT_DATA pre-processes data for CNN training
 % This file has been modified for CADASIL cerebral capillary analysis.
 % NJS - May 3, 2018
@@ -71,10 +71,6 @@ function [imdb] = formatData(opts)
         disp(['Brain Vessel Segmentation Image ' num2str(i) ': ' vessel_images(i).name]);
         if opts.loadParallel
             error('This code was not designed for parallel loading of images.')
-%             seg_img = fetchOutputs(seg_par);
-%             if i < length(raw_images)
-%                 seg_par = parfeval(p,@imread,1,fullfile(opts.lblPath,region_images(i+1).name));
-%             end
         else
             region_img = imread(fullfile(opts.lblPath,'Region Segmentation',region_images(i).name));
             vessel_img = imread(fullfile(opts.lblPath,'Vessel Segmentation',vessel_images(i).name));

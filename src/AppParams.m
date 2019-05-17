@@ -1,4 +1,4 @@
-function [opts] = appParams()
+function [opts] = AppParams()
 %% appParams.m
 % This function contains a set of parameters that can be used across all
 % functions in this repository.
