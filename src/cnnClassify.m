@@ -1,4 +1,4 @@
-function [S] = CNNpixelclass(img,net,opts,batchSize,useGpu)
+function [S] = cnnClassify(img,net,opts,batchSize,useGpu)
 % segment.m
 %
 % This function uses a convolutional neural network trained using

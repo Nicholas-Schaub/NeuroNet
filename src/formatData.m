@@ -1,4 +1,4 @@
-function [imdb] = format_data(opts)
+function [imdb] = formatData(opts)
 % FORMAT_DATA pre-processes data for CNN training
 % This file has been modified for CADASIL cerebral capillary analysis.
 % NJS - May 3, 2018

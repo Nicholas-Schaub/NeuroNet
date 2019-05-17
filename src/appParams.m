@@ -5,7 +5,7 @@ function [opts] = appParams()
 %
 % There are four main attributes of the options structure returned by this
 % function:
-% opts.gen - General information,file paths, gpu usage, and parallel processing
+% opts - General information,file paths, gpu usage, and parallel processing
 % opts.network - CNN network construction attributes
 % opts.train - CNN training atrributes
 % opts.prep - Image preprocessing attributes
@@ -14,18 +14,22 @@ opts = struct;
 
 %% General options
 % Paths to directories
-opts.expDir = '.\Brain Segmentation';
-opts.imgPath = '.\Transmittance Images';
-opts.lblPath = '.\';
+opts.expDir = '.\Path\To\Checkpoints'; % will make the dir if it doesn't exist
+opts.imgPath = '.\Path\To\Images';
+opts.lblPath = '.\Path\To\Labels';
 opts.useGpu = true;
+opts.numGpus = [1]; % can be a scalar (n) that will find the first n gpus,
+                    % or can be a vector of gpu indices
+opts.cudaPath = []; % if empty, will try to determine the cuda install path
+                    % and will compile cpu version if can't be found
 opts.verbose = false; % not implemented, will provide debugging information
                       % in the command window when set to true
 opts.storeGpu = false; % not implemented, will store data on GPU to
                        % minimize data transfer
 opts.loadParallel = false; % when true, loads the next set of images while
-                          % processing the current set.
+                           % processing the current set.
 opts.writeParallel = false; % when true, start a parallel process to write
-                           % an image.
+                            % an image.
 
 %% Network Structure
 % Note: The general network structure is a residual network regardless of

@@ -1,4 +1,4 @@
-function [S] = CNNsegment(img,net,opts,batchSize,useGpu)
+function [S] = cnnAttribute(img,net,opts,batchSize,useGpu)
 % segment.m
 %
 % This function uses a convolutional neural network trained using
