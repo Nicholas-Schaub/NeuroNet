@@ -43,7 +43,7 @@ for layer = 1:numel(layers)
                 nn.addLayer(currentLayer,c,{previousLayer},{currentLayer},...
                            {[currentLayer '_f'] [currentLayer '_b']});
                 nn = init_params(nn);
-                nn.addLayer([currentLayer '_relu'],dagnn.ReLU('leak',opts.network.leakyReLU),...
+                nn.addLayer([currentLayer '_relu'],dagnn.ReLU('leak',opts.network.leakyReLU,'method',opts.network.reluMethod),...
                             {currentLayer},{[currentLayer '_relu']});
                 currentLayer = [currentLayer '_relu'];
                 nn = init_params(nn);
@@ -60,7 +60,8 @@ for layer = 1:numel(layers)
                 reductionLayers(end+1) = reductionLayers(end);
                 depth = reductionLayers.*2;
                 [nn,currentLayer] = createInception(net,previousLayer,currentLayer,...
-                                     filterSize(3),filtSizes,reductionLayers,depth);
+                                     filterSize(3),filtSizes,reductionLayers,depth,...
+                                     opts.network.reluMethod,opts.network.leakyReLU);
         end
 
         % Create Network in Network layer (NIN)
@@ -70,7 +71,7 @@ for layer = 1:numel(layers)
             nn.addLayer(ninLayer,c,{currentLayer},{ninLayer},...
                        {[ninLayer '_f'] [ninLayer '_b']});
             nn = init_params(nn);
-            nn.addLayer([ninLayer '_relu'],dagnn.ReLU('leak',opts.network.leakyReLU),...
+            nn.addLayer([ninLayer '_relu'],dagnn.ReLU('leak',opts.network.leakyReLU,'method',opts.network.reluMethod),...
                         {ninLayer},{[ninLayer '_relu']});
             nn = init_params(nn);
             currentLayer = [ninLayer '_relu'];
@@ -94,7 +95,7 @@ for layer = 1:numel(layers)
                 nn.addLayer(scaleLayer,c,{previousLayer},{scaleLayer},...
                            {[scaleLayer '_f'] [scaleLayer '_b']});
                 nn = init_params(nn);
-                nn.addLayer([scaleLayer '_relu'],dagnn.ReLU('leak',opts.network.leakyReLU),...
+                nn.addLayer([scaleLayer '_relu'],dagnn.ReLU('leak',opts.network.leakyReLU,'method',opts.network.reluMethod),...
                             {scaleLayer},{[scaleLayer '_relu']});
                 nn = init_params(nn);
                 previousLayer = [scaleLayer '_relu'];

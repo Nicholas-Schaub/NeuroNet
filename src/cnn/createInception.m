@@ -1,4 +1,4 @@
-function [ net, outVar, outChan ] = createInception(net,inVar,outVar,inChan,sizes,redDepth,depth,varargin)
+function [ net, outVar, outChan ] = createInception(net,inVar,outVar,inChan,sizes,redDepth,depth,reluType,leak,varargin)
 
 if isempty(varargin)
     useBatchNorm = false;
@@ -70,7 +70,7 @@ for i = 1:length(sizes)
         
         % ReLU
         dnbr = [dnb 'r'];
-        net.addLayer(dnbr,dagnn.ReLU('method','elu'),...
+        net.addLayer(dnbr,dagnn.ReLU('method',reluType,'leak',leak),...
                      {dnb},...               % Input variable
                      {dnbr});           % Output variable
 
@@ -100,7 +100,7 @@ for i = 1:length(sizes)
     end
     
     % ReLU
-    net.addLayer([snb 'r'],dagnn.ReLU('method','elu'),...
+    net.addLayer([snb 'r'],dagnn.ReLU('method',reluType,'leak',leak),...
                  {snb},...         % Input layer
                  {[snb 'r']});           % Output layer
              
@@ -121,7 +121,7 @@ if length(redDepth) > length(sizes) && inChan > 1
                  {[dnb 'f'] [dnb 'b']}); % Filters and biases
     net = init_params(net);
     % ReLU
-    net.addLayer([dnb 'r'],dagnn.ReLU('method','elu'),...
+    net.addLayer([dnb 'r'],dagnn.ReLU('method',reluType,'leak',leak),...
                  {dnb},...               % Input variable
                  {[dnb 'r']});           % Output variable
              
