@@ -28,5 +28,5 @@ function [J] = Untile(Jx,sizes)
     end
     
     unpad = ([size(J,1),size(J,2)] - im_size)./2;
-    J = J(ceil(unpad(1))+1:im_size(1)+round(unpad(1)),ceil(unpad(2))+1:im_size(2)+round(unpad(2)),:); 
+    J = J(floor(unpad(1))+1:im_size(1)+floor(unpad(1)),floor(unpad(2))+1:im_size(2)+floor(unpad(2)),:); 
 end
