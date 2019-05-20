@@ -136,22 +136,26 @@ for i = 1:opts.network.numNetworks
     [best,ind] = max([stats.val.F1]);
     disp(['Best training F1 was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
     load(['../Checkpoints 1/net-epoch-' num2str(ind) '.mat']);
-    save(['../Checkpoints 1/bestSeg.mat'],'net');
+    mkdir('./models');
+    net = dagnn.DagNN.loadobj(net);
+    net.removeLayer({net.layers(85:end).name});
+    save(['./models/bestFind.mat'],'net');
     
     % Find the best network for counting nuclei
     load(['../Checkpoints 1/net-epoch-' num2str(opts.train.numEpochs) '.mat']);
     [best,ind] = min([stats.val.RMSE]);
     disp(['Best training RMSE was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
     load(['../Checkpoints 1/net-epoch-' num2str(ind) '.mat']);
-    save(['../Checkpoints 1/bestCount.mat'],'net');
+    net = dagnn.DagNN.loadobj(net);
+    net.removeLayer({net.layers(37:84).name});
+    save(['./models/bestCount.mat'],'net');
     
     % Load the best network for nuclei counting, delete segmentation
     % components, and retrain for finetuning
     net = dagnn.DagNN.loadobj(net);
-    net.removeLayer({net.layers(37:84).name});
-    for i = 37:numel(length(layers))
-        if isa(layers.block,'dagnn.ReLU')
-            layers.block.leak = 0.05;
+    for i = 37:numel(length(net.layers))
+        if isa(net.layers(i).block,'dagnn.ReLU')
+            net.layers(i).block.leak = 0.05;
         end
     end
     opts.train.numEpochs = 100;
