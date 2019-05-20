@@ -6,7 +6,7 @@ function [J] = Untile(Jx,sizes)
         case 1
             error('Need at least two inputs.')
         case 2
-            im_size = sizes;
+            im_size = sizes(1:2);
         otherwise
             error('Incorrect number of inputs.')
     end

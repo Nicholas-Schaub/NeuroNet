@@ -48,9 +48,8 @@ opts.network.complexity = 5;
 opts.network.networkDepth = 5;
 opts.network.layerDepth = 1;
 opts.network.numClass = 3; %TODO finish implementing in initializeCNN and format_data
-opts.network.classLabels = {'gray',...
-                            'nothing',...
-                            'white'};
+opts.network.classLabels = {'Class1',...
+                            'Class2'};
 opts.network.filterSize = 5;
 opts.network.layerTypeName = containers.Map([1:3],...
                                             {'normal',...
@@ -115,7 +114,7 @@ opts.prep.preLoad = true; % true = images stored in memory
 %              - for classification, set to bin edges just like the
 %                histcounts function. There should be C+1 values, so if you
 %                have 3 classes there should be 4 values.
-opts.prep.binThreshold = [0.5 1.5 2.5 3.5];
+opts.prep.binThreshold = 0.5;
 opts.prep.foreVal = 1; % for attributes
 opts.prep.backVal = -1; % for attributes
 opts.prep.foreWeightType = 'distance'; % Can be distance or intensity
