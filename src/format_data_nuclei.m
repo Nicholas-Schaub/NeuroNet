@@ -857,7 +857,7 @@ function [imdb] = format_data_nuclei(opts)
             L = bwlabel(seg_pixels(:,:,:,j)>0);
             N = 1:max(L(:));
             E = intersect(N,unique(L(:,1)));
-            E = [E;intersect(N,unique(L(:,1)))];
+            E = [E;intersect(N,unique(L(1,:))')];
             for k = 1:numel(E)
                 N(N==E(k)) = [];
             end
