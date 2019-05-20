@@ -116,17 +116,32 @@ for i = 1:opts.network.numNetworks
     opts.prep.getBatch = @(imdb,batch) get_batch(imdb,batch,opts);
     [net, info] = cnn_train_dag(net, imdb, opts.prep.getBatch, opts.train) ;
     
+    opts.train.numEpochs = 160;
+    imdb.images.weight = sqrt(imdb.images.weight);
+    opts.prep.getBatch = @(imdb,batch) get_batch(imdb,batch,opts);
+    [net, info] = cnn_train_dag(net, imdb, opts.prep.getBatch, opts.train) ;
+    
+    opts.train.numEpochs = 240;
+    opts.prep.mixWeightsWithLabels = true;
+    opts.prep.getBatch = @(imdb,batch) get_batch(imdb,batch,opts);
+    [net, info] = cnn_train_dag(net, imdb, opts.prep.getBatch, opts.train) ;
+    
+    opts.train.numEpochs = 289;
+    imdb.images.weight = (imdb.images.weight).^2;
+    opts.prep.getBatch = @(imdb,batch) get_batch(imdb,batch,opts);
+    [net, info] = cnn_train_dag(net, imdb, opts.prep.getBatch, opts.train) ;
+    
     % Find the best network for nuclei segmentation
-    load(fullfile('../Checkpoints 1/net-epoch-100.mat'));
+    load(['../Checkpoints 1/net-epoch-' num2str(opts.train.numEpochs) '.mat']);
     [best,ind] = max([stats.val.F1]);
     disp(['Best training F1 was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
     load(['../Checkpoints 1/net-epoch-' num2str(ind) '.mat']);
     save(['../Checkpoints 1/bestSeg.mat'],'net');
     
     % Find the best network for counting nuclei
-    load(fullfile('../Checkpoints 1/net-epoch-400.mat'));
+    load(['../Checkpoints 1/net-epoch-' num2str(opts.train.numEpochs) '.mat']);
     [best,ind] = min([stats.val.RMSE]);
-    disp(['Best training L2 was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
+    disp(['Best training RMSE was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
     load(['../Checkpoints 1/net-epoch-' num2str(ind) '.mat']);
     save(['../Checkpoints 1/bestCount.mat'],'net');
     
@@ -134,6 +149,11 @@ for i = 1:opts.network.numNetworks
     % components, and retrain for finetuning
     net = dagnn.DagNN.loadobj(net);
     net.removeLayer({net.layers(37:84).name});
+    for i = 37:numel(length(layers))
+        if isa(layers.block,'dagnn.ReLU')
+            layers.block.leak = 0.05;
+        end
+    end
     opts.train.numEpochs = 100;
     opts.prep.getBatch = @(imdb,batch) get_batch_count(imdb,batch,opts);
     opts.train.expDir = [opts.expDir ' Count'];
