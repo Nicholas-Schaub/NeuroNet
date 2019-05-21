@@ -49,6 +49,7 @@ function [S] = CNNAttribute(img,net,opts,batchSize,useGpu)
         %net.mode = 'test';
         pred_ind = net.getVarIndex('pred');
         lbl_ind = net.getVarIndex('label');
+        nn.mode = 'test';
         if isnan(pred_ind)
             error('Could not find prediction layer.');
         end
