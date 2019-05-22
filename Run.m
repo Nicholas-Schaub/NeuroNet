@@ -153,26 +153,44 @@ for i = 1:opts.network.numNetworks
     % Load the best network for nuclei counting, delete segmentation
     % components, and retrain for finetuning
     net = dagnn.DagNN.loadobj(net);
-    for i = 37:numel(length(net.layers))
-        if isa(net.layers(i).block,'dagnn.ReLU')
-            net.layers(i).block.leak = 0.05;
+    for j = 37:numel(net.layers)
+        if isa(net.layers(j).block,'dagnn.ReLU')
+            net.layers(j).block.leak = 1;
+            net.layers(j).block.useShortCircuit = 1;
         end
     end
-    opts.train.numEpochs = 100;
+    opts.train.numEpochs = 50;
     opts.prep.getBatch = @(imdb,batch) get_batch_count(imdb,batch,opts);
     opts.train.expDir = [opts.expDir ' Count'];
     opts.train.derOutputs(1:2) = [];
     [net, info] = cnn_train_dag(net, imdb, opts.prep.getBatch, opts.train) ;
+    save('./models/opts.mat','opts');
+    load([opts.train.expDir filesep 'net-epoch-50.mat'])
+    [best,ind] = min([stats.val.RMSE]);
+    disp(['Best training RMSE was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
+    load([opts.train.expDir filesep 'net-epoch-' num2str(ind) '.mat']);
+    save(['./models/finalCount.mat'],'net');
     
     % Load the best network for nuclei counting, delete segmentation
     % components, and retrain for finetuning
-    load(['../Checkpoints 1/bestSeg.mat'],'net');
+    load(['./models/bestFind.mat'],'net');
     opts = appParamsNuclei();
     net = dagnn.DagNN.loadobj(net);
     net.removeLayer({net.layers(85:end).name});
-    opts.train.numEpochs = 400;
+    opts.train.numEpochs = 50;
     opts.prep.getBatch = @(imdb,batch) get_batch_find(imdb,batch,opts);
     opts.train.expDir = [opts.expDir ' Find'];
     imdb.images.weight(imdb.images.label>0) = mean(imdb.images.weight(imdb.images.label>0));
+    for j = 1:numel(net.layers)
+        if isa(net.layers(j).block,'dagnn.ReLU')
+            net.layers(j).block.leak = 1;
+            net.layers(j).block.useShortCircuit = 1;
+        end
+    end
     [net, info] = cnn_train_dag(net, imdb, opts.prep.getBatch, opts.train) ;
+    load([opts.train.expDir filesep 'net-epoch-50.mat'])
+    [best,ind] = max([stats.val.F1]);
+    disp(['Best training F1 was ' num2str(best) ' at epoch ' num2str(ind) '. Saving...']);
+    load([opts.train.expDir filesep 'net-epoch-' num2str(ind) '.mat']);
+    save(['./models/finalFind.mat'],'net');
 end
