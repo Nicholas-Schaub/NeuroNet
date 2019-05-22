@@ -49,6 +49,7 @@ function [S] = CNNAttribute(img,net,opts,batchSize,useGpu)
         %net.mode = 'test';
         pred_ind = net.getVarIndex('pred');
         lbl_ind = net.getVarIndex('label');
+        nn.mode = 'test';
         if isnan(pred_ind)
             error('Could not find prediction layer.');
         end
@@ -88,9 +89,9 @@ function [S] = CNNAttribute(img,net,opts,batchSize,useGpu)
         for batch = 1:length(sub_batches)-1
             nn.eval({'input',img_pixels(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)),'label',seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1))});
             if useGpu
-                seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = gather(nn.getVar('pred').value)>0;
+                seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = gather(nn.getVar('pred').value);
             else
-                seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = (nn.getVar('pred').value)>0;
+                seg_img(:,:,1,sub_batches(batch)+1:sub_batches(batch+1)) = (nn.getVar('pred').value);
             end
             disp(['Finished batch ' num2str(batch) ' of ' num2str(length(sub_batches)-1) '. Total duration: ' num2str(toc)]);
         end
