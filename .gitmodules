@@ -1,3 +1,6 @@
 [submodule "matconvnet"]
 	path = matconvnet
 	url = https://github.com/Nicholas-Schaub/matconvnet.git
+[submodule "pytorch-mcn"]
+	path = pytorch-mcn
+	url = https://github.com/albanie/pytorch-mcn.git
