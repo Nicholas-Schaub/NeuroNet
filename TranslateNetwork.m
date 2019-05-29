@@ -1,6 +1,6 @@
-networkPath = fullfile('.','models','bestFind.mat');
+networkPath = fullfile('.','finalFind.mat');
 optionsPath = fullfile('..','Checkpoints 1','options.mat');
-addpath(genpath('src'));
+addpath(genpath('src'),'-begin');
 
 run(fullfile('.','matconvnet','matlab','vl_setupnn'));
 addpath(fullfile('.','matconvnet','examples'));
