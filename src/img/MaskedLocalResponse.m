@@ -5,11 +5,22 @@ function response = MaskedLocalResponse(I,mask,winSize)
     % local distribution of pixels in the mask foreground.
     vals = I.*(mask);
     
-    local_count = imboxfilt(double(mask),winSize,'Padding','symmetric','NormalizationFactor',1);
-    local_sum = imboxfilt(vals,winSize,'Padding','symmetric','NormalizationFactor',1);
+    if ismatrix(I)
+        local_count = imboxfilt(double(mask),winSize,'Padding','symmetric','NormalizationFactor',1);
+        local_sum = imboxfilt(vals,winSize,'Padding','symmetric','NormalizationFactor',1);
+    else
+        local_count = imboxfilt3(double(mask),winSize,'Padding','symmetric','NormalizationFactor',1);
+        local_sum = imboxfilt3(vals,winSize,'Padding','symmetric','NormalizationFactor',1);
+    end
     local_mean = local_sum./local_count;
     local_mean(mask==0) = 0;
-    local_sqr_sum = imboxfilt(vals.^2,winSize,'Padding','symmetric','NormalizationFactor',1);
+    
+    if ismatrix(I)
+        local_sqr_sum = imboxfilt(vals.^2,winSize,'Padding','symmetric','NormalizationFactor',1);
+    else
+        local_sqr_sum = imboxfilt3(vals.^2,winSize,'Padding','symmetric','NormalizationFactor',1);
+    end
+    
     local_sqr_mean = local_sqr_sum./local_count;
     local_sqr_mean(mask==0) = 0;
     local_std = sqrt(local_sqr_mean-local_mean.^2);
